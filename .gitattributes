@@ -1,0 +1,7 @@
+# Chuẩn hoá line endings: dùng LF trong repo, tự convert theo OS khi checkout.
+* text=auto eol=lf
+
+# Binary (không động vào).
+*.png binary
+*.jpg binary
+*.ico binary

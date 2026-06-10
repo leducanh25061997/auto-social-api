@@ -12,7 +12,7 @@ import { logger } from '../../utils/logger';
  *   biết mà tạm dừng tài khoản.
  */
 
-const GRAPH_BASE = `https://graph.facebook.com/${env.FACEBOOK_GRAPH_VERSION}`;
+export const GRAPH_BASE = `https://graph.facebook.com/${env.FACEBOOK_GRAPH_VERSION}`;
 
 /** Đã cấu hình App ID + Secret hay chưa. */
 export const isFacebookConfigured = (): boolean =>
@@ -28,7 +28,7 @@ export const assertFacebookConfigured = (): void => {
 };
 
 /** appsecret_proof = HMAC-SHA256(access_token, app_secret) — Graph yêu cầu khi bật. */
-const appsecretProof = (token: string): string =>
+export const appsecretProof = (token: string): string =>
   createHmac('sha256', env.FACEBOOK_APP_SECRET).update(token).digest('hex');
 
 interface GraphErrorBody {
@@ -150,6 +150,42 @@ export const connectWithCode = async (
   const token = await getLongLivedToken(shortToken);
   const profile = await getProfile(token.accessToken);
   return { profile, token };
+};
+
+/** Page kèm access token riêng — DÙNG NỘI BỘ để đăng bài (KHÔNG trả ra FE). */
+export interface FacebookPageWithToken extends FacebookPage {
+  accessToken: string;
+}
+
+/**
+ * Lấy danh sách Page kèm `access_token` của từng Page (cần để đăng bài thay mặt
+ * Page). Token này KHÔNG bao giờ được trả ra ngoài — chỉ dùng server-side.
+ */
+export const getPagesWithToken = async (
+  token: string,
+): Promise<FacebookPageWithToken[]> => {
+  const url =
+    `${GRAPH_BASE}/me/accounts` +
+    `?fields=id,name,category,access_token,picture{url}` +
+    `&limit=100` +
+    `&access_token=${encodeURIComponent(token)}` +
+    `&appsecret_proof=${appsecretProof(token)}`;
+  const data = await callGraph<{
+    data?: Array<{
+      id: string;
+      name: string;
+      category?: string;
+      access_token?: string;
+      picture?: { data?: { url?: string } };
+    }>;
+  }>(url, 'pages-with-token');
+  return (data.data ?? []).map((p) => ({
+    id: p.id,
+    name: p.name,
+    category: p.category ?? null,
+    picture: p.picture?.data?.url ?? null,
+    accessToken: p.access_token ?? '',
+  }));
 };
 
 /** Lấy danh sách Page mà tài khoản này là quản trị viên. */

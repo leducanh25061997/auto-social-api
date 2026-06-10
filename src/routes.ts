@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authRoutes } from './modules/auth/auth.routes';
 import { usersRoutes } from './modules/users/users.routes';
 import { facebookAccountsRoutes } from './modules/facebook-accounts/facebook-accounts.routes';
+import { facebookPagePostsRoutes } from './modules/facebook-page-posts/facebook-page-posts.routes';
 import { instagramAccountsRoutes } from './modules/instagram-accounts/instagram-accounts.routes';
 
 /**
@@ -13,6 +14,7 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use('/users', usersRoutes);
 router.use('/facebook-accounts', facebookAccountsRoutes);
+router.use('/facebook-posts', facebookPagePostsRoutes);
 router.use('/instagram-accounts', instagramAccountsRoutes);
 
 export const apiRouter = router;

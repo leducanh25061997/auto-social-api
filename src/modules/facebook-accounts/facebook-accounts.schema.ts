@@ -18,10 +18,13 @@ export const connectFacebookSchema = z.object({
   name: z.string().trim().min(1).max(100).optional(),
 });
 
-/** Query phân trang + lọc danh sách tài khoản. */
+/**
+ * Query phân trang + lọc danh sách tài khoản.
+ * `limit` không bắt buộc: KHÔNG truyền -> lấy hết (dùng cho dropdown chọn tài khoản).
+ */
 export const listFacebookAccountsSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(10),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
   search: z.string().trim().max(100).optional(),
   status: z.enum(['active', 'inactive']).optional(),
 });

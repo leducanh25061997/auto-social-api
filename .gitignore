@@ -33,3 +33,6 @@ Thumbs.db
 # --- Misc ---
 *.local
 tmp/
+
+# Ảnh/video người dùng upload cho bài đăng
+uploads/

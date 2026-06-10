@@ -83,6 +83,85 @@ export type FacebookAccountUpdateData = Partial<{
   lastRefreshedAt: Date | null;
 }>;
 
+// ── Facebook page post ───────────────────────────────────────────────────────
+
+export type FacebookPostType = 'feed' | 'reel';
+export type FacebookPostStatus =
+  | 'draft'
+  | 'scheduled'
+  | 'processing'
+  | 'published'
+  | 'failed';
+
+export interface FacebookPagePostImage {
+  imagePath: string;
+  imageUrl: string;
+}
+
+/** Entity phẳng của 1 bài đăng Facebook Page. */
+export interface FacebookPagePost {
+  id: string;
+  facebookAccountId: string;
+  fbUserId: string;
+  pageId: string;
+  pageName: string;
+  postType: FacebookPostType;
+  message: string;
+  firstComment: string;
+  images: FacebookPagePostImage[];
+  videoPath: string;
+  videoUrl: string;
+  status: FacebookPostStatus;
+  scheduledAt: Date | null;
+  timezone: string;
+  retryCount: number;
+  postId: string;
+  permalinkUrl: string;
+  errorMessage: string;
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/** Dữ liệu tạo 1 bài đăng. */
+export type FacebookPagePostCreateData = {
+  facebookAccountId: string;
+  fbUserId: string;
+  pageId: string;
+  pageName?: string;
+  postType: FacebookPostType;
+  message?: string;
+  firstComment?: string;
+  images?: FacebookPagePostImage[];
+  videoPath?: string;
+  videoUrl?: string;
+  status: FacebookPostStatus;
+  scheduledAt?: Date | null;
+  timezone?: string;
+};
+
+/** Dữ liệu cập nhật 1 bài đăng. */
+export type FacebookPagePostUpdateData = Partial<{
+  facebookAccountId: string;
+  fbUserId: string;
+  pageId: string;
+  pageName: string;
+  postType: FacebookPostType;
+  message: string;
+  firstComment: string;
+  images: FacebookPagePostImage[];
+  videoPath: string;
+  videoUrl: string;
+  status: FacebookPostStatus;
+  scheduledAt: Date | null;
+  timezone: string;
+  retryCount: number;
+  postId: string;
+  permalinkUrl: string;
+  errorMessage: string;
+  publishedAt: Date | null;
+}>;
+
 // ── Instagram account ────────────────────────────────────────────────────────
 
 /** Entity phẳng của 1 tài khoản Instagram đã kết nối. */

@@ -3,6 +3,7 @@ import { env } from './config/env';
 import { logger } from './utils/logger';
 import { connectDB, disconnectDB } from './config/db';
 import { startFacebookTokenRefreshJob } from './modules/facebook-accounts/facebook-token-refresh.job';
+import { startFacebookPublishJob } from './modules/facebook-page-posts/facebook-page-posts-publish.job';
 import { startInstagramTokenRefreshJob } from './modules/instagram-accounts/instagram-token-refresh.job';
 
 /** Khởi động: kết nối MongoDB trước rồi mới mở HTTP server (fail-fast nếu DB lỗi). */
@@ -17,6 +18,8 @@ const start = async (): Promise<void> => {
   // Tự gia hạn long-lived token Facebook/Instagram định kỳ (không chặn khởi động, không crash).
   startFacebookTokenRefreshJob();
   startInstagramTokenRefreshJob();
+  // Đăng các bài Facebook đã tới giờ lên lịch (chu kỳ 1 phút).
+  startFacebookPublishJob();
 
   /** Graceful shutdown — đóng HTTP server & ngắt kết nối MongoDB đúng cách. */
   const shutdown = async (signal: string): Promise<void> => {

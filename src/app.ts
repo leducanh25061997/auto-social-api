@@ -1,4 +1,5 @@
 import './types/express.d'; // load global type augmentation
+import path from 'path';
 import express, { type Application, type Request, type Response } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -13,7 +14,9 @@ export const createApp = (): Application => {
   const app = express();
 
   // --- Security & infra middlewares ---
-  app.use(helmet());
+  // crossOriginResourcePolicy = cross-origin để FE (origin khác) tải được ảnh/video
+  // tĩnh trong /uploads (preview bài đăng).
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(
     cors({
       origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(',').map((o) => o.trim()),
@@ -24,6 +27,9 @@ export const createApp = (): Application => {
   app.use(express.urlencoded({ extended: true }));
   app.use(pinoHttp({ logger }));
   app.use(globalRateLimiter);
+
+  // --- Static: ảnh/video người dùng upload cho bài đăng Facebook ---
+  app.use('/uploads', express.static(path.resolve('uploads')));
 
   // --- Health check ---
   app.get('/health', (_req: Request, res: Response) => {

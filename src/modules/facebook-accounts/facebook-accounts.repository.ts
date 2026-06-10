@@ -30,12 +30,14 @@ export const facebookAccountsRepository = {
       filter.$or = [{ name: rx }, { fbUserId: rx }];
     }
 
+    const itemsQuery = FacebookAccountModel.find(filter).sort({ createdAt: -1 });
+    // Không có limit -> lấy hết; có limit -> phân trang.
+    if (limit !== undefined) {
+      itemsQuery.skip((page - 1) * limit).limit(limit);
+    }
+
     const [items, total] = await Promise.all([
-      FacebookAccountModel.find(filter)
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean(),
+      itemsQuery.lean(),
       FacebookAccountModel.countDocuments(filter),
     ]);
 

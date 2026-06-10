@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import { MulterError } from 'multer';
 import { ApiError } from '../utils/ApiError';
 import { logger } from '../utils/logger';
 import { env } from '../config/env';
@@ -65,6 +66,13 @@ export const errorHandler = (
     // Vd: id sai định dạng -> với người dùng là "không tìm thấy".
     statusCode = 404;
     message = 'Không tìm thấy dữ liệu yêu cầu';
+  } else if (err instanceof MulterError) {
+    // Lỗi upload (file quá lớn, quá nhiều file...) -> thông báo thân thiện.
+    statusCode = 400;
+    message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? 'Tệp tải lên quá lớn. Vui lòng chọn tệp nhỏ hơn.'
+        : 'Tải tệp lên thất bại. Vui lòng thử lại.';
   } else if (err instanceof Error) {
     message = env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message;
   }

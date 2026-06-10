@@ -117,12 +117,14 @@ export const facebookAccountsService = {
 
   async list(query: ListFacebookAccountsQuery): Promise<PaginatedFacebookAccounts> {
     const { items, total } = await facebookAccountsRepository.list(query);
+    // Không truyền limit -> trả tất cả trong 1 trang.
+    const limit = query.limit ?? total;
     return {
       items: items.map(toSafe),
       total,
       page: query.page,
-      limit: query.limit,
-      totalPages: Math.max(1, Math.ceil(total / query.limit)),
+      limit,
+      totalPages: query.limit ? Math.max(1, Math.ceil(total / query.limit)) : 1,
     };
   },
 
